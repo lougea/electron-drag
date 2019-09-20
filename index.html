@@ -7,17 +7,17 @@
     <h1>video</h1>
     <p>Viens à la maison y a le printemps qui chante</p>
    <video src="assets/manger.mp4" width="400px" height="300px" autoplay  id="pause" controls></video>
+   <br />
+   <button id="test-button">Console log from Main Process</button>
+   <button id="button-quit">Quit App</button>
+   <button id="button-ipc">Talk with Main Process</button>
+   <br />
    <a href="assets/water.mp4" download>Download Image There</a>
    <progress value="0" max="100" id="progress"></progress>
+   <br />
+   <br />
   </body>
   <script>
-    //   document.getElementById("pause").addEventListener(click, ()=> {
-    //       pause()
-    //   })
-    // require('./renderer.js')
-//  const fs = require('fs')
-// const {dialog} = require('electron').remote
-// document.getElementById('btn-createfile').addEventListener("click", () => {},false )
-        window.progress = document.getElementById("progress")
+    require('./renderer.js')
   </script>
 </html>

@@ -1,7 +1,28 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, dialog , globalShortcut, Menu, ipcMain } = require('electron')
 
+global['myglob'] = 'Variable déclarée in main.js'
+/// Tray
+// function createTray() {
+//   tray = new tray('trayTemplate@2x.jpg')
+// }
+
+ipcMain.on('channel1',(e,args) => {
+  console.log(args)
+  e.sender.send('channel1-response', 'Message Received on "Channel1' )
+})
+
+/// Créer le Menu du navigateur
+let mainMenu = Menu.buildFromTemplate(require('./mainMenu'))
+
+// Créer menu click/droit:
+let contextMenu = Menu.buildFromTemplate([  
+  {label:'DevTools', role :'toggleDevTools' },
+,]) 
+
+
+/// Créer la/les fenetre du navigateur ///
 function createWindow () {
-  // Cree la/les fenetre du navigateur.
+  // createTray()
   let win = new BrowserWindow({
     width: 900,
     height: 600,
@@ -9,89 +30,105 @@ function createWindow () {
       nodeIntegration: true
     }
   })
+    Menu.setApplicationMenu(mainMenu)
+    win.webContents.on('context-menu', e => {
+      contextMenu.popup()
+    })
 
-  let wintwo = new BrowserWindow({
-    width: 400,
-    height: 200,
-    parent: win,
-    modal: true,
-    frame: false, 
-    titleBarStyle: 'hidden',
-    hasShadow : true,
-    defaultFontFamily: 'cursive',
-    webPreferences: {
-        nodeIntegration: true 
-      },
-  })
+  // let wintwo = new BrowserWindow({
+  //   width: 400,
+  //   height: 200,
+  //   parent: win,
+  //   modal: true,
+  //   frame: false, 
+  //   titleBarStyle: 'hidden',
+  //   hasShadow : true,
+  //   defaultFontFamily: 'cursive',
+  //   webPreferences: {
+  //       nodeIntegration: true 
+  //     },
+  // })
 
 
-/// Exemple & manipulation
+/// Exemple & manipulation  ///
 
-setTimeout( () => {
-      wintwo.show()
-      setTimeout(() => {
-          wintwo.close() 
-          wintwo = null
-      },2000) 
-  },1000)
-  // and load the index.html of the app.
-win.loadFile('index.html')
+    // setTimeout( () => {
+    //      wintwo.show()
+    //      setTimeout(() => {
+    //       wintwo.close() 
+    //       wintwo = null
+    //         },1000) 
+    // },1000)
 
-// win.loadURL('https://google.com')
-wintwo.loadFile('indextwo.html')
-// wintwo.on('browser-window-blur', e => {
-//     console.log("Pas de focus sur la deuxième principale")
-// })
-// wintwo.on('closed', () => {
-//     win.maximize()
-// })
-// console.log(win.isVisible())
-// console.log(win.isKiosk())
-// console.log(BrowserWindow.getAllWindows())
-// win.on('move', () => {
-// let myNotification = new Notification('Tappable', {
-//   body: 'Tu viens de bouger la fenêtre :o'
-// })
+/// Load the index.html of the app : ///
 
-// myNotification.onclick = () => {
-//   console.log('Notification clicked')
-// }
+    win.loadFile('index.html')
 
-// }),
-//   win.webContents.openDevTools();
-///////////// Web content
-let wc = win.webContents
-console.log(wc)
-wc.on('did-finish-load', ()=> {
+    // wintwo.loadFile('indextwo.html')
+
+    // win.loadURL('https://google.com')
+
+    // console.log(win.isVisible())
+    
+    // console.log(win.isKiosk())
+
+    // console.log(BrowserWindow.getAllWindows())
+
+    /* wintwo.on('browser-window-blur', e => {
+         console.log("Pas de focus sur la deuxième principale")
+     }) */
+
+    /* wintwo.on('closed', () => {
+        win.maximize()
+        }) */
+
+    /* win.on('move', () => {
+     let myNotification = new Notification('Tappable', {
+     body: 'Tu viens de bouger la fenêtre :o'
+    }) */
+
+    /* myNotification.onclick = () => {
+      console.log('Notification clicked')
+     } 
+    }), */
+    
+
+/// Web content ///
+    
+    let wc = win.webContents
+    console.log(wc)
+    wc.on('did-finish-load', ()=> {
     console.log('content fully loaded')
-})
+    })
 
-// wc.on('before-input-event',(e,input) => {
-//     // console.log(e)
-//     console.log(`${input.key} : ${input.type}`)
-// })
+    /* wc.on('before-input-event',(e,input) => {
+        console.log(e)
+        console.log(`${input.key} : ${input.type}`)
+    }) */
 
-wc.on('media-started-playing',() => {
+    //   win.webContents.openDevTools();
+
+    wc.on('media-started-playing',() => {
     console.log('video Started')
-})
+    })
 
-wc.on('media-paused',() => {
+    wc.on('media-paused',() => {
     console.log('video en pause')
-})
+    })
 
-wc.on('context-menu',(e, params) => { 
+    wc.on('context-menu',(e, params) => { 
     console.log(`${params.mediaType} at x:${params.x} adn y:${params.y}`)
-})  // right click
+    })  // right click
 
-wc.on('context-menu', (e, params) => {
-    let selectedText = params.selectionText
-    wc.executeJavaScript(`alert("${selectedText}")`)
-})
+    // wc.on('context-menu', (e, params) => {
+    // let selectedText = params.selectionText
+    // wc.executeJavaScript(`alert("${selectedText}")`)
+    // })
 
-let ses = wc.session
-console.log(ses)
+    let ses = wc.session
+    console.log(ses)
 
-ses.on('will-download', (e,downloadItem, webContents) => {
+    ses.on('will-download', (e,downloadItem, webContents) => {
     let fileName = downloadItem.getFilename()
     let fileSize = downloadItem.getTotalBytes()
 
@@ -112,13 +149,37 @@ ses.on('will-download', (e,downloadItem, webContents) => {
 })
 
 }
-
 /////////////////////// app .on
 // app.on('browser-window-focus', e => {
 //     console.log("focus")
 // })
 
+const options = {
+    type: 'question',
+    buttons: ['?', 'Oui', 'No'],
+    defaultId: 2,
+    title: 'Petite question',
+    message: 'As tu aimé la blanquette ?',
+    detail: 'Petite aide : OSS 117',
+    checkboxLabel: 'Remember my answer',
+    checkboxChecked: true,
+  };
+  
 app.on('ready', () => {
+      ////// Register a 'CommandOrControl+X' shortcut listener.
+    const ret = globalShortcut.register('CommandOrControl+A', () => {
+        // boite de dialogue
+        dialog.showMessageBox(null, options, (response, checkboxChecked) => {
+          console.log(response);
+          console.log(checkboxChecked);
+        });
+    
+      })
+      if (!ret) {
+        console.log('registration failed')
+      }
+
     createWindow()
 })
 
+/////// globalShortcut
