@@ -54,3 +54,6 @@ ipcRenderer.on('channel1-response', (e, args) => {
   //   
   
 //   })
+
+const { dialog } = require('electron').remote
+console.log(dialog)

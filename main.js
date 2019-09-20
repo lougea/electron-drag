@@ -101,6 +101,17 @@ function createWindow () {
     console.log('content fully loaded')
     })
 
+    wc.on('did-finish-load', () => {
+
+      dialog.showOpenDialog( {
+          buttonLabel:'Select a video',
+          defaultPath: app.getPath('home')
+      }, filePaths => {
+          console.log(filePaths)
+      })
+      
+  })
+
     /* wc.on('before-input-event',(e,input) => {
         console.log(e)
         console.log(`${input.key} : ${input.type}`)
